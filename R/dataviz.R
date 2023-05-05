@@ -150,3 +150,96 @@ hsl_to_hex = function(h, s, l) {
 
   return(paste("#", r, g, b, sep = ""))
 }
+
+#' Make a color palette
+#'
+#' `make_pal()` creates a color palette wrapped in a list of named elements from
+#' a target hue or color name.
+#'
+#' @param type The style of palette, either "Light" or "Dark"
+#' @param hue An integer between 0 and 360, representing the target palette
+#' color's "hue"
+#' @param name A valid string representing a color name from `common_colors`
+#' @param print Whether to print the palette to the console, TRUE or FALSE
+#' @returns A list of named elements making up a color palette
+#' @examples
+#' In it's simplest form, specify a type and a default hue will be used:
+#' make_pal("Dark")
+#'
+#' Optionally, pass your own target color via 'hue' or 'name':
+#' make_pal("Light", hue = 10)
+#' make_pal("Dark", name = "Orange")
+#'
+#' Additionally, you can opt to print the HSL values inspiring the palette to the console:
+#' make_pal("Light", name = "Blue", print = TRUE)
+#' @export
+make_pal <- function(type = c("Light", "Dark"), hue = 110, name = NULL, print = FALSE) {
+
+  type <- match.arg(type)
+
+  if(is.null(hue) & is.null(name)) {
+    stop("Enter a valid 'hue' value (integer 0 to 360) or a valid 'name' value from `common_colors`.")
+  }
+
+  if(!(is.numeric(hue) & hue >= 0 & hue <= 360)) {
+    stop("Parameter 'hue' must be an integer between 0 and 360")
+  }
+
+  common = common_colors
+
+  if(!is.null(hue) & !is.null(name)) {
+    stop("Pass either a 'hue' or 'name' value, not both.")
+  }
+
+  if(!is.null(name)) {
+    if(!(is.character(name) & name %in% common$color)) {
+      stop("Parameter 'name' must be a string matching valid color names. Check `common_colors` for possible values.")
+    }
+    hue = round(common$hue[common$color == name] + (15 * runif(1, -1, 1)))
+  }
+
+  if(!(print %in% c(TRUE, FALSE))) {
+    stop("Parameter 'print' should be TRUE or FALSE.")
+  }
+
+  hue = as.integer(hue)
+
+  # Core Color
+  if(type == "Light") {
+    core = round(c(hue, 65, 30))
+  } else {
+    core = round(c(hue, 65, 70))
+  }
+
+  # Background
+  if(type == "Light") {
+    back = round(c(hue, 30, 92))
+  } else {
+    back = round(c(hue, 30, 20))
+  }
+
+  # Text
+  if(type == "Light") {
+    txt = round(c(hue, 30, 20))
+  } else {
+    txt = round(c(hue, 30, 92))
+  }
+
+  # Lines
+  if(type == "Light") {
+    lyns = round(c(hue, 10, 80))
+  } else {
+    lyns = round(c(hue, 10, 35))
+  }
+
+  if(print) {
+    print(paste("Core HSL: ", core[1], ", ", core[2], ", ", core[3], sep = ""))
+  }
+
+  pal = list(
+    core = hsl_to_hex(core[1], core[2], core[3]),
+    background = hsl_to_hex(back[1], back[2], back[3]),
+    text = hsl_to_hex(txt[1], txt[2], txt[3]),
+    lines = hsl_to_hex(lyns[1], lyns[2], lyns[3])
+  )
+}

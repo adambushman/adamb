@@ -2,5 +2,6 @@
 
 export(hsl_to_hex)
 export(main_color_obj)
+export(make_pal)
 export(theme_adamb)
 import(ggplot2)
