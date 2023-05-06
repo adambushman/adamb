@@ -7,9 +7,14 @@ Authors@R: person("Adam", "Bushman", email = "adam.bushman1@gmail.com",
 Author: Adam Bushman [aut, cre]
 Maintainer: Adam Bushman <adam.bushman1@gmail.com>
 Description: This package contains code to make Adam B's life easier. From ggplot themes to custom functions to fun datasets.
-Imports:
-    ggplot2
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.3
+Depends: 
+    R (>= 2.10)
+Imports: 
+    DBI,
+    ggplot2,
+    RMariaDB,
+    stats

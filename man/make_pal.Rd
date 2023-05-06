@@ -4,7 +4,7 @@
 \alias{make_pal}
 \title{Make a color palette}
 \usage{
-make_pal(type = c("Light", "Dark"), hue = 110, name = NULL, print = FALSE)
+make_pal(type = c("Light", "Dark"), hue = NULL, name = NULL, print = FALSE)
 }
 \arguments{
 \item{type}{The style of palette, either "Light" or "Dark"}
@@ -22,4 +22,12 @@ A list of named elements making up a color palette
 \description{
 `make_pal()` creates a color palette wrapped in a list of named elements from
 a target hue or color name.
+}
+\examples{
+# In it's simplest form, specify a type and a default hue or valid color name from `common_colors`:
+make_pal("Light", hue = 10)
+make_pal("Dark", name = "Orange")
+
+# Additionally, you can opt to print the HSL values inspiring the palette to the console:
+make_pal("Light", name = "Blue", print = TRUE)
 }

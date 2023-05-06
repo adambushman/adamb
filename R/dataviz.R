@@ -33,7 +33,7 @@ main_color_obj <- function() {
 #' theme_adamb()
 #'
 #' # Optionally, pass a color object, featuring at least four named elements
-#' # ("core', "background", "text", "lines"), each featuring a hexadecimal color
+#' # "core', "background", "text", "lines", each featuring a hexadecimal color
 #' # value:
 #' theme_adamb(list(core = "#1b7e64", background = "#e4f1ed", text = "#24423a", lines = "#c7d1ce"))
 #' @import ggplot2
@@ -163,17 +163,14 @@ hsl_to_hex = function(h, s, l) {
 #' @param print Whether to print the palette to the console, TRUE or FALSE
 #' @returns A list of named elements making up a color palette
 #' @examples
-#' In it's simplest form, specify a type and a default hue will be used:
-#' make_pal("Dark")
-#'
-#' Optionally, pass your own target color via 'hue' or 'name':
+#' # In it's simplest form, specify a type and a default hue or valid color name from `common_colors`:
 #' make_pal("Light", hue = 10)
 #' make_pal("Dark", name = "Orange")
 #'
-#' Additionally, you can opt to print the HSL values inspiring the palette to the console:
+#' # Additionally, you can opt to print the HSL values inspiring the palette to the console:
 #' make_pal("Light", name = "Blue", print = TRUE)
 #' @export
-make_pal <- function(type = c("Light", "Dark"), hue = 110, name = NULL, print = FALSE) {
+make_pal <- function(type = c("Light", "Dark"), hue = NULL, name = NULL, print = FALSE) {
 
   type <- match.arg(type)
 
@@ -181,21 +178,24 @@ make_pal <- function(type = c("Light", "Dark"), hue = 110, name = NULL, print = 
     stop("Enter a valid 'hue' value (integer 0 to 360) or a valid 'name' value from `common_colors`.")
   }
 
-  if(!(is.numeric(hue) & hue >= 0 & hue <= 360)) {
-    stop("Parameter 'hue' must be an integer between 0 and 360")
+  if(!is.null(hue) & !is.null(name)) {
+    stop("Pass either a 'hue' or 'name' value, not both.")
   }
 
   common = common_colors
 
-  if(!is.null(hue) & !is.null(name)) {
-    stop("Pass either a 'hue' or 'name' value, not both.")
+  if(!is.null(hue)) {
+    if(!(is.numeric(hue) & hue >= 0 & hue <= 360)) {
+      stop("Parameter 'hue' must be an integer between 0 and 360")
+    }
+    hue = round(hue)
   }
 
   if(!is.null(name)) {
     if(!(is.character(name) & name %in% common$color)) {
       stop("Parameter 'name' must be a string matching valid color names. Check `common_colors` for possible values.")
     }
-    hue = round(common$hue[common$color == name] + (15 * runif(1, -1, 1)))
+    hue = round(common$hue[common$color == name] + (15 * stats::runif(1, -1, 1)))
   }
 
   if(!(print %in% c(TRUE, FALSE))) {

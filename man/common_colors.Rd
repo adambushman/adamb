@@ -10,7 +10,6 @@ A data frame with 12 rows and 2 columns:
 \describe{
   \item{color}{Common color name}
   \item{hue}{Hue code between 0 and 360}
-  ...
 }
 }
 \source{

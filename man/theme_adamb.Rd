@@ -23,7 +23,7 @@ Adam B
 theme_adamb()
 
 # Optionally, pass a color object, featuring at least four named elements
-# ("core', "background", "text", "lines"), each featuring a hexadecimal color
+# "core', "background", "text", "lines", each featuring a hexadecimal color
 # value:
 theme_adamb(list(core = "#1b7e64", background = "#e4f1ed", text = "#24423a", lines = "#c7d1ce"))
 }
