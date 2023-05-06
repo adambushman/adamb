@@ -71,7 +71,7 @@ mysql_peek_tables <- function(cname = NULL) {
   })
 }
 
-#' Peek MySQL database tables
+#' Peek MySQL database fields
 #'
 #' `mysql_peek_fields()` lists the field names present in a particular table
 #' from a valid MySQL database connection
@@ -104,6 +104,73 @@ mysql_peek_fields <- function(cname = NULL, table = NULL) {
 
     DBI::dbListFields(ifelse(is.null(cname), con, cname), table)
 
+  }, error <- function(e) {
+    print(paste("ERROR:", e))
+  })
+}
+
+#' Send MySQL query
+#'
+#' `mysql_send_query()` sends a query to the database per the connection passed,
+#' closes the connection when appropriate, and returns the result
+#' @seealso [mysql_connect(), mysql_peek_tables(), mysql_peek_fields()]
+#' @param cname A string representing the connection variable name from the environment
+#' @param query A string representing the query to execute
+#' @returns A dataframe of the query results
+#' @examples
+#' mysql_send_query("mycname", "SELECT * FROM mytable")
+#' @import DBI
+#' @export
+mysql_send_query <- function(cname = NULL, query = NULL) {
+  if(is.null(cname) & !exists("con")) {
+    stop("Enter a valid connection name or setup a default connection via `mysql_connect()`")
+  }
+
+  if(!is.null(cname) & !exists(cname)) {
+    stop(paste0("Cannot find the connection `", cname, "` in the environment."))
+  }
+
+  if(is.null(query)) {
+    stop("A valid query must be passed.")
+  }
+
+  tryCatch({
+
+    response <- DBI::dbSendQuery(ifelse(is.null(cname), con, cname), query)
+    results <- DBI::dbFetch(response)
+
+    DBI::dbClearResult(response)
+
+    results
+  }, error <- function(e) {
+    print(paste("ERROR:", e))
+  })
+}
+
+#' Close MySQL connection
+#'
+#' `mysql_close()` closes an open MySQL server connection
+#' @seealso [mysql_connect()]
+#' @param cname A string representing the connection variable name from the environment
+#' @returns Nothing
+#' @examples
+#' mysql_close("mycname")
+#' @import DBI
+#' @export
+mysql_close <- function(cname = NULL) {
+  if(is.null(cname) & !exists("con")) {
+    stop("Enter a valid connection name or setup a default connection via `mysql_connect()`")
+  }
+
+  if(!is.null(cname) & !exists(cname)) {
+    stop(paste0("Cannot find the connection `", cname, "` in the environment."))
+  }
+
+  tryCatch({
+
+    DBI::dbDisconnect(con)
+
+    print("Disconnected successfully")
   }, error <- function(e) {
     print(paste("ERROR:", e))
   })

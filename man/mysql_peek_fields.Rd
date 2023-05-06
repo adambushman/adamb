@@ -2,7 +2,7 @@
 % Please edit documentation in R/sql.R
 \name{mysql_peek_fields}
 \alias{mysql_peek_fields}
-\title{Peek MySQL database tables}
+\title{Peek MySQL database fields}
 \usage{
 mysql_peek_fields(cname = NULL, table = NULL)
 }
