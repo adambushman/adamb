@@ -111,7 +111,6 @@ theme_adamb <- function(color_obj = NULL) {
 
     ggplot2::theme(
       # Grid elements
-      plot.margin = ggplot2::margin(1, 1, 1, 1, "cm"),
       panel.grid = ggplot2::element_line(color = color_obj$lines),
 
       # Text elements
@@ -164,11 +163,10 @@ start_camcorder <- function(dir = NULL, width = NULL, height = NULL) {
     stop("Please enter a valid height and width integer (in cm) for the recording.")
   }
 
+  height = as.integer(height)
+  width = as.integer(width)
+
   tryCatch({
-
-    height = as.integer(height)
-    width = as.integer(width)
-
     camcorder::gg_record(
       dir = dir,
       device = "png",
@@ -178,10 +176,13 @@ start_camcorder <- function(dir = NULL, width = NULL, height = NULL) {
       dpi = 300
     )
 
-  }, error <- function(e) {
-    print(paste0("ERROR: ", e))
+  }, error = function(e) {
+    message("ERROR: ", e)
+  }, warning = function(w) {
+    message("WARNING: ", w)
   })
 }
+
 
 #' HSL color to HEX color
 #'
@@ -196,10 +197,6 @@ start_camcorder <- function(dir = NULL, width = NULL, height = NULL) {
 #' hsl_to_hex(115, 80, 50)
 #' @export
 hsl_to_hex = function(h, s, l) {
-  check_val <- function(val) {
-    val >= 0 & val <= 360
-  }
-
   if(!is.numeric(h) | !is.numeric(s) | !is.numeric(l)) {
     stop("Parameters 'h', 's', and 'l' must be integers between 0 and 360")
   }
@@ -209,7 +206,7 @@ hsl_to_hex = function(h, s, l) {
   }
 
   if(!(s >= 0 & s <= 100) | !(l >= 0 & l <= 100)) {
-    stop("Parameters 'h' must be an integers between 0 and 360")
+    stop("Parameters 's' and 'l' must be an integers between 0 and 100")
   }
 
   s = as.integer(s) / 100
@@ -288,20 +285,20 @@ make_color_obj <- function(type = c("Light", "Dark"), hue = NULL, name = NULL, p
     stop("Pass either a 'hue' or 'name' value, not both.")
   }
 
-  common = common_colors
+  common = adamb::common_colors
 
   if(!is.null(hue)) {
     if(!(is.numeric(hue) & hue >= 0 & hue <= 360)) {
       stop("Parameter 'hue' must be an integer between 0 and 360")
     }
-    hue = round(hue)
   }
 
   if(!is.null(name)) {
     if(!(is.character(name) & name %in% common$color)) {
       stop("Parameter 'name' must be a string matching valid color names. Check `common_colors` for possible values.")
     }
-    hue = round(common$hue[common$color == name] + (15 * stats::runif(1, -1, 1)))
+    hue = common$hue[common$color == name] + (15 * stats::runif(1, -1, 1))
+    hue = ifelse(hue < 0, 360 + hue, hue)
   }
 
   if(!(print %in% c(TRUE, FALSE))) {

@@ -26,10 +26,10 @@ way to access personal databases.
 
 To get started with the package, install using `remotes`:
 
-```{r}
-# install.packages("remotes")
+```{r eval=FALSE}
+install.packages("remotes")
 
-#remotes::install_github("adambushman/adamb")
+remotes::install_github("adambushman/adamb")
 ```
 
 Once installed, load the package using the `library` command below or reference
@@ -76,8 +76,8 @@ For high resolution plots designed for export, use the `start_camcorder()` funct
 to begin a recording. It's a simplified version of `camcorder::gg_record()` which 
 assumes some default values for "device" (.png), "unit" (cm), and "dpi" (300).
 
-```{r}
-#start_camcorder("/my_directory", 16, 9)
+```{r eval=FALSE}
+start_camcorder("/my_directory", 16, 9)
 ```
 
 This function is designed for use with `theme_adamb_cam()`, which includes sizing
@@ -131,9 +131,11 @@ wheel) or a valid color name.
 ```{r}
 # Passing in a color hue
 gen_color_obj1 = make_color_obj("Dark", hue = 88)
+gen_color_obj1
 
 # Passing in a color name
 gen_color_obj2 = make_color_obj("Dark", name = "Red")
+gen_color_obj2
 ```
 
 To find all the valid color names, just reference `common_colors` from the package for a
@@ -142,3 +144,123 @@ dataframe including their hues:
 ```{r}
 common_colors
 ```
+
+We can pass one of the above objects to `theme_adamb()` and instantly have a cohesively
+styled theme for our plot:
+
+```{r}
+ggplot(office_data) +
+  geom_point(
+    aes(month, sales), 
+    color = gen_color_obj2$core
+  ) +
+  labs(title = "Office Sales") +
+  theme_adamb(gen_color_obj2)
+```
+
+As per usual, immediately following a custom theme you can add the standard `theme()`
+from {ggplot2} to override or add custom elements to the plot.
+
+One of the helper functions to `make_color_obj()` is `hsl_to_hex()`, a function to 
+translate "Hue", "Saturation", and "Lightness" values to their hexadecimal representation.
+Should this ever be needed, simply call and pass in its 3 values (respecting that "h" must 
+be a value between 0 and 360, while "s" and "l" are values between 0 and 100).
+
+```{r}
+hsl_to_hex(50, 70, 90)
+```
+
+
+# Querying Databases
+
+Databases often contain the data for our analyses and visualizations. Extract that data
+is one of the core first steps. However, most packages have a pretty heavy workflow for
+connection and any operations. 
+
+This package aims to simplify it quite a bit by encapsulating a good portion of the 
+workflow and using reasonable defaults that can be overridden if possible. It is noted these
+functions are designed solely for use with MySQL databases.
+
+## Connecting
+
+The headliner here is `mysql_connect()`, which handles all the leg work of connection with
+some common defaults:
+
+```{r eval=FALSE}
+# Pass the minimum set of parameters
+mysql_connect(username = "my_user", password = "my_pass123", dbname = "my_db")
+
+# Pass all parameters to override the defaults
+mysql_connect(
+  username = "my_user", 
+  password = "my_pass123", 
+  dbname = "my_db", 
+  host = "my_host", 
+  port = 12345, 
+  cname = "my_connection"
+)
+```
+
+Using the minimum required parameters will leverage default "host" and "port" values 
+for Digital Ocean (my main database server).
+
+"cname" stands for the connection variable name to be assigned to the environment. 
+If no value is passed, it will default to "con". For functions below, use whatever name
+for the connection appears in the environment after `mysql_connect()`.
+
+## Peeking
+
+Two functions help describe the database before diving head first. Using whatever connection
+variable from the environment created by `mysql_connect()` (let's say "con"), we can 
+get a summary of tables and a singular table's fields:
+
+```{r eval=FALSE}
+# Peek at all tables in the database
+mysql_peek_tables(con)
+
+# Peek at all the fields in a particular table
+mysql_peek_fields(con, "table_1")
+```
+
+With such detail in hand, we can begin to execute query's on the database.
+
+## Querying
+
+To send a query, we need only reference the connection variable and pass a string
+containing our query.
+
+```{r eval=FALSE}
+my_query = "SELECT * FROM table_1"
+
+mysql_send_query(con, my_query)
+```
+
+This function encapsulates all the logic for requesting a response, storing the data, and
+clearing the response. We can move right along with our analysis.
+
+## Finishing Up
+
+Once we've completed all of our operations on the database, we need to close the connection. 
+While the normal workflow with the direct API is simple enough, you can use the built in 
+function here:
+
+```{r eval=FALSE}
+mysql_close(con)
+```
+
+# Data
+
+Two data sets have been included in this package for complimentary use with the functions
+therein:
+
+*   `common_colors`
+    -   This is a dataset containing the common color names and hue codes for the color wheel
+    at 30 deg intervals. It's commonly used with `make_color_obj()`.
+*   `office_sales`
+    -   This is a nice dataset for practicing various chart types in {ggplot2}. It's derived 
+    from *The Office* TV show, S07:E14, which displays the monthly sales figures for office and
+    warehouse staff.
+
+# Coming Soon
+
+More features of the package will debut soon!
