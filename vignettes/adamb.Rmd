@@ -29,7 +29,7 @@ To get started with the package, install using `remotes`:
 ```{r}
 # install.packages("remotes")
 
-remotes::install_github("adambushman/adamb")
+#remotes::install_github("adambushman/adamb")
 ```
 
 Once installed, load the package using the `library` command below or reference
@@ -77,7 +77,7 @@ to begin a recording. It's a simplified version of `camcorder::gg_record()` whic
 assumes some default values for "device" (.png), "unit" (cm), and "dpi" (300).
 
 ```{r}
-start_camcorder("/my_directory", 16, 9)
+#start_camcorder("/my_directory", 16, 9)
 ```
 
 This function is designed for use with `theme_adamb_cam()`, which includes sizing
