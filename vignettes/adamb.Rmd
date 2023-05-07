@@ -1,0 +1,144 @@
+---
+title: "{adamb} Vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{adamb-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+This package is designed by Adam B, for Adam B. The idea is to package all frequently used
+code into a single source for consistency and to make Adam B's life easier.
+
+The package contains fun data sets, useful data visualization functions, and a simplified
+way to access personal databases. 
+
+# Getting Started
+
+To get started with the package, install using `remotes`:
+
+```{r}
+# install.packages("remotes")
+
+remotes::install_github("adambushman/adamb")
+```
+
+Once installed, load the package using the `library` command below or reference
+individual components using the `::` framework:
+
+```{r}
+# Load the entire library into the session
+
+library("adamb")
+
+# Reference library components
+
+adamb::office_data
+```
+
+You'll find helpful functions for data visualization, connecting to databases, 
+and even fun, useful data sets used frequently.
+
+
+# Data Visualization
+
+## Working with Plots
+
+Visualizing data in R via {ggplot2} is a joy but often styling a plot follows
+a common convention. With this in mind, use the `theme_adamb()` to leverage
+foundational styling via a custom ggplot theme.
+
+```{r}
+library('ggplot2')
+
+# Using a plot with no custom theme
+
+ggplot(office_data) +
+  geom_point(aes(month, sales))
+
+# Using `theme_adamb()`
+
+ggplot(office_data) +
+  geom_point(aes(month, sales)) +
+  theme_adamb()
+```
+
+For high resolution plots designed for export, use the `start_camcorder()` function
+to begin a recording. It's a simplified version of `camcorder::gg_record()` which 
+assumes some default values for "device" (.png), "unit" (cm), and "dpi" (300).
+
+```{r}
+start_camcorder("/my_directory", 16, 9)
+```
+
+This function is designed for use with `theme_adamb_cam()`, which includes sizing
+of theme elements appropriate for a recording. A traditional workflow likely involves
+using `theme_adamb()` during initial design of the geom or stat layers and then
+calling `start_camcorder()` and swapping the theme for `theme_adamb_cam()` to 
+finish the look and feel of the plot.
+
+Another nice feature about these custom themes is the ability to pass what we call 
+a "color object". Essentially it's a list of named elements containing hexadecimal 
+color codes. Here's an example:
+
+```{r}
+# A basic color object
+
+color_obj <- list(
+  core = "#ac162c", 
+  background = "#F5F5F5", 
+  text = "#222222", 
+  lines = "#F0F0F0"
+)
+
+color_obj
+```
+
+The theme will reference these named elements to create a great look and feel.
+Just pass it to the theme. You can even reference the object's element `core`
+to use in the geom or stat layers.
+
+```{r}
+# Passing a color object
+
+ggplot(office_data) +
+  geom_point(
+    aes(month, sales), 
+    color = color_obj$core
+  ) +
+  labs(title = "Office Sales") +
+  theme_adamb(color_obj)
+```
+
+## Creating Color Objects
+
+You may or may not have a color object in mind for your plot. Consider using our built
+in function for creating a color object that is balanced in hue and complimentary in 
+elements. Here's how:
+
+Just pass in the type ("Dark" or "Light") and either a hue (0 to 360 representing the color 
+wheel) or a valid color name.
+
+```{r}
+# Passing in a color hue
+gen_color_obj1 = make_color_obj("Dark", hue = 88)
+
+# Passing in a color name
+gen_color_obj2 = make_color_obj("Dark", name = "Red")
+```
+
+To find all the valid color names, just reference `common_colors` from the package for a
+dataframe including their hues:
+
+```{r}
+common_colors
+```

@@ -14,7 +14,12 @@ RoxygenNote: 7.2.3
 Depends: 
     R (>= 2.10)
 Imports: 
+    camcorder,
     DBI,
     ggplot2,
     RMariaDB,
     stats
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

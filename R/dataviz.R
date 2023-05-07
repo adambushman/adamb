@@ -20,8 +20,9 @@ main_color_obj <- function() {
 
 #' Adam B ggplot2 theme
 #'
-#' `theme_adamb()` applies styling to ggplot objects per the preferences of
-#' Adam B
+#' `theme_adamb_cam()` applies styling to ggplot objects per the preferences of
+#' Adam B. It includes size adjustments for various elements and should be used
+#' in conjuction with a `camcorder` recording.
 #'
 #' @param color_obj A list, featuring at least four elements, each
 #' containing a hexadecimal color value: "core", "background", "text",
@@ -30,15 +31,16 @@ main_color_obj <- function() {
 #' @seealso [main_color_obj()]
 #' @returns A theme element for laying onto a ggplot object.
 #' @examples
-#' theme_adamb()
+#' # Make sure to start a `camcorder` recording
+#' theme_adamb_cam()
 #'
 #' # Optionally, pass a color object, featuring at least four named elements
 #' # "core', "background", "text", "lines", each featuring a hexadecimal color
 #' # value:
-#' theme_adamb(list(core = "#1b7e64", background = "#e4f1ed", text = "#24423a", lines = "#c7d1ce"))
+#' theme_adamb_cam(list(core = "#1b7e64", background = "#e4f1ed", text = "#24423a", lines = "#c7d1ce"))
 #' @import ggplot2
 #' @export
-theme_adamb <- function(color_obj = NULL) {
+theme_adamb_cam <- function(color_obj = NULL) {
   if(is.null(color_obj)) {
     color_obj = main_color_obj()
   }
@@ -75,6 +77,110 @@ theme_adamb <- function(color_obj = NULL) {
       axis.title.x = ggplot2::element_text(vjust = -5),
       axis.text.x = ggplot2::element_text(vjust = -1)
     )
+}
+
+#' Adam B ggplot2 theme
+#'
+#' `theme_adamb()` applies styling to ggplot objects per the preferences of
+#' Adam B, It has no size adjustments to it for scaling nicely in the "Plots"
+#' tab.
+#'
+#' @param color_obj A list, featuring at least four elements, each
+#' containing a hexadecimal color value: "core", "background", "text",
+#' and "lines". May be ignored in which case the main color object will
+#' be used.
+#' @seealso [main_color_obj()]
+#' @returns A theme element for laying onto a ggplot object.
+#' @examples
+#' theme_adamb()
+#'
+#' # Optionally, pass a color object, featuring at least four named elements
+#' # "core', "background", "text", "lines", each featuring a hexadecimal color
+#' # value:
+#' theme_adamb(list(core = "#1b7e64", background = "#e4f1ed", text = "#24423a", lines = "#c7d1ce"))
+#' @import ggplot2
+#' @export
+theme_adamb <- function(color_obj = NULL) {
+  if(is.null(color_obj)) {
+    color_obj = main_color_obj()
+  }
+
+  '%+replace%' <- ggplot2::'%+replace%'
+
+  ggplot2::theme_minimal() %+replace%
+
+    ggplot2::theme(
+      # Grid elements
+      plot.margin = ggplot2::margin(1, 1, 1, 1, "cm"),
+      panel.grid = ggplot2::element_line(color = color_obj$lines),
+
+      # Text elements
+      text = ggplot2::element_text(color = color_obj$text),
+      plot.title = ggplot2::element_text(face = "bold"),
+      plot.subtitle = ggplot2::element_text(face = "italic"),
+      plot.caption = ggplot2::element_text(face = "italic"),
+      plot.caption.position = "plot",
+      axis.text = ggplot2::element_text(color = color_obj$text),
+      strip.text = ggplot2::element_text(
+        color = color_obj$text, face = "bold"
+      ),
+
+      # Color elements
+      plot.background = ggplot2::element_rect(fill = color_obj$background, color = NA),
+      strip.background = ggplot2::element_rect(fill = color_obj$lines, color = NA)
+    )
+}
+
+#' Main color object
+#'
+#' `start_camcorder()` begins a recording of the "Viewer" tab, saving copies
+#' of the rendered plot in the directory of your choosing. It uses defaults
+#' for the device, units, and dpi. To change those, use `camcorder::gg_record()`
+#' instead of this function. It's designed to be used in conjunction with
+#' `theme_adamb_cam()`. Execute `camcorder::gg_stop_recording()` to end the
+#' recording.
+#'
+#' @seealso [theme_adamb_cam()]
+#' @param dir A string representing a valid directory on the machine for which
+#' the camcorder will save rendered plots
+#' @param width An integer for the width in cm of the rendered and saved plot
+#' @param height An integer for the height in cm of the rendered and saved plot
+#' @returns Nothing
+#' @examples
+#' # Pass in desired directory and dimensions
+#' start_camcorder("/my_directory", 16, 9)
+#' @import camcorder
+#' @export
+start_camcorder <- function(dir = NULL, width = NULL, height = NULL) {
+  if(is.null(dir) | is.null(height) | is.null(width)) {
+    stop("Please pass valid arguments before executing the function.")
+  }
+
+  if(!is.character(dir)) {
+    stop("Please enter a valid directory string.")
+  }
+
+  if(!is.numeric(height) | !is.numeric(width)) {
+    stop("Please enter a valid height and width integer (in cm) for the recording.")
+  }
+
+  tryCatch({
+
+    height = as.integer(height)
+    width = as.integer(width)
+
+    camcorder::gg_record(
+      dir = dir,
+      device = "png",
+      width = width,
+      height = height,
+      units = "cm",
+      dpi = 300
+    )
+
+  }, error <- function(e) {
+    print(paste0("ERROR: ", e))
+  })
 }
 
 #' HSL color to HEX color
@@ -151,9 +257,9 @@ hsl_to_hex = function(h, s, l) {
   return(paste("#", r, g, b, sep = ""))
 }
 
-#' Make a color palette
+#' Make a color object
 #'
-#' `make_pal()` creates a color palette wrapped in a list of named elements from
+#' `make_color_obj()` creates a color palette wrapped in a list of named elements from
 #' a target hue or color name.
 #'
 #' @param type The style of palette, either "Light" or "Dark"
@@ -164,13 +270,13 @@ hsl_to_hex = function(h, s, l) {
 #' @returns A list of named elements making up a color palette
 #' @examples
 #' # In it's simplest form, specify a type and a default hue or valid color name from `common_colors`:
-#' make_pal("Light", hue = 10)
-#' make_pal("Dark", name = "Orange")
+#' make_color_obj("Light", hue = 10)
+#' make_color_obj("Dark", name = "Orange")
 #'
 #' # Additionally, you can opt to print the HSL values inspiring the palette to the console:
-#' make_pal("Light", name = "Blue", print = TRUE)
+#' make_color_obj("Light", name = "Blue", print = TRUE)
 #' @export
-make_pal <- function(type = c("Light", "Dark"), hue = NULL, name = NULL, print = FALSE) {
+make_color_obj <- function(type = c("Light", "Dark"), hue = NULL, name = NULL, print = FALSE) {
 
   type <- match.arg(type)
 
