@@ -1,4 +1,4 @@
-# {adamb} Package <img src="https://github.com/adambushman/adamb/adamb_package_hex.png" align="right" width="400"/>
+# {adamb} Package <img src="https://github.com/adambushman/adamb/blob/main/adamb_package_hex.png" align="right" width="300"/>
 
 This package is designed by Adam B, for Adam B. The idea is to package all frequently used code into a single source for consistency and to make Adam B's life easier.
 
