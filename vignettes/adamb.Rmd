@@ -29,7 +29,7 @@ To get started with the package, install using `remotes`:
 ```{r eval=FALSE}
 install.packages("remotes")
 
-remotes::install_github("adambushman/adamb")
+remotes::install_github("adambushman/adamb", dependencies = TRUE, build_vignettes = TRUE)
 ```
 
 Once installed, load the package using the `library` command below or reference
