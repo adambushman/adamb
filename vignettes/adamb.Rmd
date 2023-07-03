@@ -170,6 +170,14 @@ be a value between 0 and 360, while "s" and "l" are values between 0 and 100).
 hsl_to_hex(50, 70, 90)
 ```
 
+Often in working with visuals, we have a background color that may not provide enough contrast for readability. In such a case, we can use the `contrast_text_color()` function to get a better color.
+
+Simply pass a hexadecimal code to the function and it will determine if white (#FFFFFF) or black (#000000) is the best contrasting color and returns the code.
+
+```{r}
+contrast_text_color("#AC192D")
+```
+
 
 # Querying Databases
 

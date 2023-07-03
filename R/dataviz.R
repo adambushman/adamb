@@ -346,3 +346,52 @@ make_color_obj <- function(type = c("Light", "Dark"), hue = NULL, name = NULL, p
     lines = hsl_to_hex(lyns[1], lyns[2], lyns[3])
   )
 }
+
+
+#' Make a color object
+#'
+#' `contrast_text_color()` finds the best black/white text contrast for a
+#' specified color background.
+#'
+#' @param hex_code The target color background
+#' @returns A hexadecimal color code best for contrast with the specified color
+#' background.
+#' @examples
+#' # White background returns black
+#' contrast_text_color("#FFFFFF")
+#'
+#' # Dark red background returns white
+#' contrast_text_color("#AC192D")
+#' @export
+contrast_text_color <- function(hex_code) {
+  # Remove the "#" symbol if present
+  hex_code <- gsub("#", "", hex_code)
+
+  # Convert hexadecimal to decimal
+  r <- strtoi(substr(hex_code, 1, 2), base = 16) / 255
+  g <- strtoi(substr(hex_code, 3, 4), base = 16) / 255
+  b <- strtoi(substr(hex_code, 5, 6), base = 16) / 255
+
+  # Linear RGB
+  r = ifelse(r > 0.03928, ((r + 0.055) / 1.055)^2.4, r / 12.92)
+  g = ifelse(g > 0.03928, ((g + 0.055) / 1.055)^2.4, g / 12.92)
+  b = ifelse(b > 0.03928, ((b + 0.055) / 1.055)^2.4, b / 12.92)
+
+  # Calculate relative luminance using the sRGB color space formula
+  luminance <- (0.2126 * r + 0.7152 * g + 0.0722 * b)
+
+  # Check contrast against black (luminance: 0)
+  contrast_black <- (luminance + 0.05) / (0 + 0.05)
+
+  # Check contrast against white (luminance: 1)
+  contrast_white <- (1 + 0.05) / (luminance + 0.05)
+
+  # Determine the best contrasting text color
+  if (contrast_black > contrast_white) {
+    text_color <- "#000000"  # Black
+  } else {
+    text_color <- "#FFFFFF"  # White
+  }
+
+  return(text_color)
+}
