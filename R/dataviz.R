@@ -348,7 +348,7 @@ make_color_obj <- function(type = c("Light", "Dark"), hue = NULL, name = NULL, p
 }
 
 
-#' Make a color object
+#' Determine color contrast
 #'
 #' `contrast_text_color()` finds the best black/white text contrast for a
 #' specified color background.
@@ -394,4 +394,59 @@ contrast_text_color <- function(hex_code) {
   }
 
   return(text_color)
+}
+
+
+#' Scale a gradient
+#'
+#' `scale_to_gradient()` will map a continuous variable to a custom gradient
+#'
+#' @param x The continuous variable to map
+#' @param len_x The length of the data frame or vector corresponding to x
+#' @param min_x The minimum value found in the variable "x"
+#' @param max_x The maximum value found in the variable "x"
+#' @param colors The target colors for the gradient
+#' @returns A hexadecimal color code mapped from "x" to the graident
+#' @examples
+#' data <- data.frame(
+#'   sales = rnorm(10, 50, 10)
+#' )
+#'
+#' data$color <- scale_to_gradient(
+#'   sales, nrow(data), min(sales), max(sales), c("green", "red")
+#' )
+#' @export
+scale_to_gradient <- function(x, len_x, min_x, max_x, colors) {
+  if(!is.null(x)) {
+    stop("'x' may not be NULL")
+  }
+  if(!is.null(len_x)) {
+    stop("'len_x' may not be NULL")
+  }
+  if(!is.null(min_x)) {
+    stop("'min_x' may not be NULL")
+  }
+  if(!is.null(max_x)) {
+    stop("'max_x' may not be NULL")
+  }
+  if(!is.null(colors)) {
+    stop("'colors' may not be NULL and must be valid hexadecimal/base R color names")
+  }
+
+  if(!is.numeric(x) & !is.numeric(len_x) & !is.numeric(min_x) & !is.numeric(max_x)) {
+    stop("Please enter numeric values for 'x', 'len_x', 'min_x', and 'min_x'")
+  }
+
+  # Create gradient indices
+  gradient_func <- colorRampPalette(colors)
+  gradient <- gradient_func(length(x))
+
+  # Scale the x value to a range between 0 and 1
+  scaled_value <- (x - min_x) / (max_x - min_x)
+
+  # Map the scaled value to an index in the colors vector
+  index <- floor(scaled_value * (len_x - 1)) + 1
+
+  # Return the corresponding color code
+  gradient[index]
 }

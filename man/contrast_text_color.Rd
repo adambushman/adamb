@@ -2,7 +2,7 @@
 % Please edit documentation in R/dataviz.R
 \name{contrast_text_color}
 \alias{contrast_text_color}
-\title{Make a color object}
+\title{Determine color contrast}
 \usage{
 contrast_text_color(hex_code)
 }
