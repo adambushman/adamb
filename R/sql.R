@@ -23,20 +23,28 @@ mysql_connect <- function(username = NULL, password = NULL, dbname = NULL, host 
     stop("Enter valid credentials for `username`, `password`, and `dbname`.")
   }
 
-  tryCatch({
-    con <- DBI::dbConnect(
-      RMariaDB::MariaDB(),
-      user = username,
-      password = password,
-      host = ifelse(!is.null(host), host, "adambushman-db-mysql-do-user-14046221-0.b.db.ondigitalocean.com"),
-      port = ifelse(!is.null(port), port, "25060"),
-      dbname = dbname
-    )
+  connection = ifelse(is.null(cname), "con", cname)
 
-    assign(ifelse(!is.null(cname), cname, "con"), con, envir = .GlobalEnv)
-  }, error = function(e) {
-    print(paste0("ERROR: ", e))
-  })
+  tryCatch(
+    {
+      con <- DBI::dbConnect(
+        RMariaDB::MariaDB(),
+        user = username,
+        password = password,
+        host = ifelse(!is.null(host), host, "adambushman-db-mysql-do-user-14046221-0.b.db.ondigitalocean.com"),
+        port = ifelse(!is.null(port), port, "25060"),
+        dbname = dbname
+      )
+
+      assign(connection, con, envir = .GlobalEnv)
+    },
+    error = function(e) {
+      print(paste0("ERROR: ", e))
+    },
+    warning = function(w) {
+      print(paste0("WARNING: ", w))
+    }
+  )
 }
 
 #' Peek MySQL database tables
@@ -185,12 +193,18 @@ mysql_close <- function(cname = NULL) {
     stop(paste0("Cannot find the connection `", cname, "` in the environment."))
   }
 
-  tryCatch({
+  connection = ifelse(is.null(cname), "con", cname)
 
-    DBI::dbDisconnect(con)
-
-    print("Disconnected successfully")
-  }, error <- function(e) {
-    print(paste("ERROR:", e))
-  })
+  tryCatch(
+    {
+      DBI::dbDisconnect(get(connection))
+      print("Disconnected successfully")
+    },
+    error <- function(e) {
+      print(paste("ERROR:", e))
+    },
+    warning <- function(w) {
+      print(paste("WARNING:", w))
+    }
+  )
 }
