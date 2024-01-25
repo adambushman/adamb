@@ -62,13 +62,19 @@ mysql_peek_tables <- function(cname = NULL) {
     stop(paste0("Cannot find the connection `", cname, "` in the environment."))
   }
 
-  tryCatch({
+  connection = ifelse(is.null(cname), "con", cname)
 
-    DBI::dbListTables(ifelse(is.null(cname), con, cname))
-
-  }, error <- function(e) {
-    print(paste("ERROR:", e))
-  })
+  tryCatch(
+    {
+      DBI::dbListTables(get(connection))
+    },
+    error = function(e) {
+      print(paste("ERROR:", e))
+    },
+    warning = function(w) {
+      print(paste("WARNING:", w))
+    }
+  )
 }
 
 #' Peek MySQL database fields
@@ -100,13 +106,19 @@ mysql_peek_fields <- function(cname = NULL, table = NULL) {
     stop("A valid table name must be provided. Use `mysql_peek_tables()` for a reference.")
   }
 
-  tryCatch({
+  connection = ifelse(is.null(cname), "con", cname)
 
-    DBI::dbListFields(ifelse(is.null(cname), con, cname), table)
-
-  }, error <- function(e) {
-    print(paste("ERROR:", e))
-  })
+  tryCatch(
+    {
+      DBI::dbListFields(get(connection), table)
+    },
+    error = function(e) {
+      print(paste("ERROR:", e))
+    },
+    warning = function(w) {
+      print(paste("WARNING:", w))
+    }
+  )
 }
 
 #' Send MySQL query
@@ -134,17 +146,24 @@ mysql_send_query <- function(cname = NULL, query = NULL) {
     stop("A valid query must be passed.")
   }
 
-  tryCatch({
+  connection = ifelse(is.null(cname), "con", cname)
 
-    response <- DBI::dbSendQuery(ifelse(is.null(cname), con, cname), query)
-    results <- DBI::dbFetch(response)
+  tryCatch(
+    {
+      response <- DBI::dbSendQuery(get(connection), query)
+      results <- DBI::dbFetch(response)
 
-    DBI::dbClearResult(response)
+      DBI::dbClearResult(response)
 
-    results
-  }, error <- function(e) {
-    print(paste("ERROR:", e))
-  })
+      results
+    },
+    error = function(e) {
+      print(paste("ERROR:", e))
+    },
+    warning = function(w) {
+      print(paste("WARNING:", w))
+    }
+  )
 }
 
 #' Close MySQL connection
