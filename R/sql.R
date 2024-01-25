@@ -66,11 +66,11 @@ mysql_peek_tables <- function(cname = NULL) {
     stop("Enter a valid connection name or setup a default connection via `mysql_connect()`")
   }
 
-  if(!is.null(cname) & !exists(cname)) {
-    stop(paste0("Cannot find the connection `", cname, "` in the environment."))
-  }
-
   connection = ifelse(is.null(cname), "con", cname)
+
+  if(!exists(connection)) {
+    stop(paste0("Cannot find the connection `", connection, "` in the environment."))
+  }
 
   tryCatch(
     {
@@ -79,9 +79,7 @@ mysql_peek_tables <- function(cname = NULL) {
     error = function(e) {
       print(paste("ERROR:", e))
     },
-    warning = function(w) {
-      print(paste("WARNING:", w))
-    }
+    warning = function(w) {}
   )
 }
 
@@ -106,15 +104,15 @@ mysql_peek_fields <- function(cname = NULL, table = NULL) {
     stop("Enter a valid connection name or setup a default connection via `mysql_connect()`")
   }
 
-  if(!is.null(cname) & !exists(cname)) {
-    stop(paste0("Cannot find the connection `", cname, "` in the environment."))
+  connection = ifelse(is.null(cname), "con", cname)
+
+  if(!exists(connection)) {
+    stop(paste0("Cannot find the connection `", connection, "` in the environment."))
   }
 
   if(is.null(table)) {
     stop("A valid table name must be provided. Use `mysql_peek_tables()` for a reference.")
   }
-
-  connection = ifelse(is.null(cname), "con", cname)
 
   tryCatch(
     {
@@ -123,9 +121,7 @@ mysql_peek_fields <- function(cname = NULL, table = NULL) {
     error = function(e) {
       print(paste("ERROR:", e))
     },
-    warning = function(w) {
-      print(paste("WARNING:", w))
-    }
+    warning = function(w) {}
   )
 }
 
@@ -146,15 +142,15 @@ mysql_send_query <- function(cname = NULL, query = NULL) {
     stop("Enter a valid connection name or setup a default connection via `mysql_connect()`")
   }
 
-  if(!is.null(cname) & !exists(cname)) {
-    stop(paste0("Cannot find the connection `", cname, "` in the environment."))
+  connection = ifelse(is.null(cname), "con", cname)
+
+  if(!exists(connection)) {
+    stop(paste0("Cannot find the connection `", connection, "` in the environment."))
   }
 
   if(is.null(query)) {
     stop("A valid query must be passed.")
   }
-
-  connection = ifelse(is.null(cname), "con", cname)
 
   tryCatch(
     {
@@ -168,9 +164,7 @@ mysql_send_query <- function(cname = NULL, query = NULL) {
     error = function(e) {
       print(paste("ERROR:", e))
     },
-    warning = function(w) {
-      print(paste("WARNING:", w))
-    }
+    warning = function(w) {}
   )
 }
 
@@ -189,21 +183,21 @@ mysql_close <- function(cname = NULL) {
     stop("Enter a valid connection name or setup a default connection via `mysql_connect()`")
   }
 
-  if(!is.null(cname) & !exists(cname)) {
-    stop(paste0("Cannot find the connection `", cname, "` in the environment."))
-  }
-
   connection = ifelse(is.null(cname), "con", cname)
+
+  if(!exists(connection)) {
+    stop(paste0("Cannot find the connection `", connection, "` in the environment."))
+  }
 
   tryCatch(
     {
       DBI::dbDisconnect(get(connection))
       print("Disconnected successfully")
     },
-    error <- function(e) {
+    error = function(e) {
       print(paste("ERROR:", e))
     },
-    warning <- function(w) {
+    warning = function(w) {
       print(paste("WARNING:", w))
     }
   )
